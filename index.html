@@ -35,6 +35,25 @@
 
   <div id="app"></div>
 
-  <script src="https://unpkg.com/webamp"></script>
+  <script src="https://unpkg.com/webamp"></script> <script src="https://unpkg.com/webamp"></script>
+<script>
+  const Webamp = window.Webamp;
+
+  new Webamp({
+    initialTracks: [
+      {
+        metaData: {
+          artist: "LIMPTEK",
+          title: "TEKSTREAM 23 – Session 001"
+        },
+        url: "https://archive.org/details/tekstream232311"
+      }
+    ],
+    initialSkin: {
+      url: "https://archive.org/download/winampskin_base-2-91/base-2-91.wsz"
+    }
+  }).renderWhenReady(document.getElementById("app"));
+</script>
+
 </body>
 </html>
