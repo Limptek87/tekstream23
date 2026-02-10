@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="utf-8" />
-  <title>TEKSTREAM 23 – Limptek23 Archive</title>
+  <title>TEKSTREAM 23 – Limptek Archive</title>
 
   <style>
     body {
@@ -18,6 +18,10 @@
       width: 220px;
       max-width: 80%;
       filter: drop-shadow(0 0 12px rgba(0,255,0,0.25));
+    }
+
+    #app {
+      margin-top: 40px;
     }
   </style>
 </head>
@@ -35,53 +39,41 @@
 
   <div id="app"></div>
 
+  <!-- Webamp -->
   <script src="https://unpkg.com/webamp"></script>
-<script><div id="app"></div>
 
-<script src="https://unpkg.com/webamp"></script>
-<script>
-(async () => {
-  const item = "tekstream232311"; // <-- DEIN archive.org Item
-  const filesUrl = `https://archive.org/metadata/${item}/files`;
+  <script>
+    (async () => {
+      const item = "tekstream232311"; // archive.org Item-ID
+      const filesUrl = `https://archive.org/metadata/${item}/files`;
 
-  const data = await fetch(filesUrl).then(r => r.json());
+      const response = await fetch(filesUrl);
+      const data = await response.json();
 
-  const tracks = data.result
-    .filter(f => f.name.endsWith(".mp3"))
-    .map(f => ({
-      metaData: {
-        artist: "LIMPTEK",
-        title: f.name.replace(".mp3", "")
-      },
-      url: `https://archive.org/download/${item}/${f.name}`
-    }));
+      const tracks = data.result
+        .filter(file => file.name.endsWith(".mp3"))
+        .map(file => ({
+          metaData: {
+            artist: "LIMPTEK",
+            title: file.name.replace(".mp3", "")
+          },
+          url: `https://archive.org/download/${item}/${file.name}`
+        }));
 
-  new window.Webamp({
-    initialTracks: tracks,
-    initialSkin: {
-      url: "https://archive.org/download/winampskin_base-2-91/base-2-91.wsz"
-    }
-  }).renderWhenReady(document.getElementById("app"));
-})();
-</script>
-
-  const Webamp = window.Webamp;
-
-  new Webamp({
-    initialTracks: [
-      {
-        metaData: {
-          artist: "LIMPTEK",
-          title: "TEKSTREAM 23 – Session 001"
+      const webamp = new window.Webamp({
+        initialTracks: tracks,
+        initialSkin: {
+          url: "https://archive.org/download/winampskin_base-2-91/base-2-91.wsz"
         },
-        url: "https://archive.org/details/tekstream232311"
-      }
-    ],
-    initialSkin: {
-      url: "https://archive.org/download/winampskin_base-2-91/base-2-91.wsz"
-    }
-  }).renderWhenReady(document.getElementById("app"));
-</script>
+        __butterchurnOptions: {
+          importButterchurn: () => import("https://unpkg.com/butterchurn"),
+          importPresets: () => import("https://unpkg.com/butterchurn-presets")
+        }
+      });
+
+      webamp.renderWhenReady(document.getElementById("app"));
+    })();
+  </script>
 
 </body>
 </html>
