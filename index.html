@@ -35,8 +35,36 @@
 
   <div id="app"></div>
 
-  <script src="https://unpkg.com/webamp"></script> <script src="https://unpkg.com/webamp"></script>
+  <script src="https://unpkg.com/webamp"></script>
+<script><div id="app"></div>
+
+<script src="https://unpkg.com/webamp"></script>
 <script>
+(async () => {
+  const item = "tekstream232311"; // <-- DEIN archive.org Item
+  const filesUrl = `https://archive.org/metadata/${item}/files`;
+
+  const data = await fetch(filesUrl).then(r => r.json());
+
+  const tracks = data.result
+    .filter(f => f.name.endsWith(".mp3"))
+    .map(f => ({
+      metaData: {
+        artist: "LIMPTEK",
+        title: f.name.replace(".mp3", "")
+      },
+      url: `https://archive.org/download/${item}/${f.name}`
+    }));
+
+  new window.Webamp({
+    initialTracks: tracks,
+    initialSkin: {
+      url: "https://archive.org/download/winampskin_base-2-91/base-2-91.wsz"
+    }
+  }).renderWhenReady(document.getElementById("app"));
+})();
+</script>
+
   const Webamp = window.Webamp;
 
   new Webamp({
