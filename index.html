@@ -76,13 +76,39 @@ window.webamp.onPlay(() => {
 });
 
 /* --- Time Counter --- */
+<script>
+const audio = document.getElementById("player");
+
+let plays = Number(localStorage.getItem("plays") || 0);
+let seconds = Number(localStorage.getItem("seconds") || 0);
+
+const playsEl = document.getElementById("plays");
+const timeEl  = document.getElementById("time");
+
+playsEl.textContent = plays;
+
+function renderTime(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  timeEl.textContent = `${m}:${String(s).padStart(2,"0")}`;
+}
+
+renderTime(seconds);
+
+audio.addEventListener("play", () => {
+  plays++;
+  localStorage.setItem("plays", plays);
+  playsEl.textContent = plays;
+});
+
 setInterval(() => {
-  if (window.webamp && window.webamp.getMediaStatus()?.playing) {
-    playedSeconds++;
-    localStorage.setItem("playedSeconds", playedSeconds);
-    document.getElementById("time").textContent =
-      Math.floor(playedSeconds / 60);
+  if (!audio.paused && !audio.ended) {
+    seconds++;
+    localStorage.setItem("seconds", seconds);
+    renderTime(seconds);
   }
 }, 1000);
+</script>
+
 </script>
 </html>
