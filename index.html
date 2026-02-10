@@ -2,50 +2,39 @@
 <html lang="de">
 <head>
   <meta charset="utf-8" />
-  <title>TEKSTREAM 23 – LIMPTek Archive</title>
+  <title>TEKSTREAM 23 – Limptek23 Archive</title>
+
   <style>
     body {
       margin: 0;
-      background: green;
+      background: black;
       color: #0f0;
       font-family: monospace;
+      text-align: center;
+    }
+
+    .logo {
+      margin: 20px 0;
+      width: 220px;
+      max-width: 80%;
+      filter: drop-shadow(0 0 12px rgba(0,255,0,0.25));
     }
   </style>
 </head>
+
 <body>
+
+  <img
+    src="logo.png"
+    alt="LIMPTEK – Just a Soundsystem"
+    class="logo"
+  >
+
+  <h1>TEKSTREAM 23</h1>
+  <p>vinyl only · live · no sync · no edits</p>
+
   <div id="app"></div>
 
   <script src="https://unpkg.com/webamp"></script>
-  <script>
-    const ARCHIVE_ID = "tekstream232311";
-
-    async function loadArchiveTracks() {
-      const res = await fetch(`https://archive.org/metadata/${ARCHIVE_ID}`);
-      const data = await res.json();
-
-      return data.files
-        .filter(f =>
-          f.name.endsWith(".mp3") || f.name.endsWith(".wav")
-        )
-        .map(f => ({
-          metaData: {
-            artist: "LIMPTek",
-            title: f.name.replace(".mp3","").replace(".wav",""),
-          },
-          url: `https://archive.org/download/${ARCHIVE_ID}/${encodeURIComponent(f.name)}`
-        }));
-    }
-
-    (async () => {
-      const tracks = await loadArchiveTracks();
-
-      new Webamp({
-        initialTracks: tracks,
-        initialSkin: {
-          url: "https://archive.org/download/winampskin_classic/Winamp%20Classic.wsz"
-        }
-      }).renderWhenReady(document.getElementById("app"));
-    })();
-  </script>
 </body>
 </html>
