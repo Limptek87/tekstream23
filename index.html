@@ -50,5 +50,39 @@
   ></iframe>
 
 </body>
+<div id="stats" style="margin-top:40px; font-size:14px; opacity:0.7;">
+  <div>Views: <span id="views">0</span></div>
+  <div>Plays: <span id="plays">0</span></div>
+  <div>Abgespielte Zeit: <span id="time">0</span> min</div>
+</div>
+<script>
+/* --- PAGE VIEWS --- */
+let views = Number(localStorage.getItem("views") || 0) + 1;
+localStorage.setItem("views", views);
+document.getElementById("views").textContent = views;
 
+/* --- PLAY COUNT & TIME --- */
+let plays = Number(localStorage.getItem("plays") || 0);
+let playedSeconds = Number(localStorage.getItem("playedSeconds") || 0);
+
+document.getElementById("plays").textContent = plays;
+document.getElementById("time").textContent = Math.floor(playedSeconds / 60);
+
+/* --- Webamp Hooks --- */
+window.webamp.onPlay(() => {
+  plays++;
+  localStorage.setItem("plays", plays);
+  document.getElementById("plays").textContent = plays;
+});
+
+/* --- Time Counter --- */
+setInterval(() => {
+  if (window.webamp && window.webamp.getMediaStatus()?.playing) {
+    playedSeconds++;
+    localStorage.setItem("playedSeconds", playedSeconds);
+    document.getElementById("time").textContent =
+      Math.floor(playedSeconds / 60);
+  }
+}, 1000);
+</script>
 </html>
