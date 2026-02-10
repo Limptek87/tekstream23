@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8" />
-  <title>TEKSTREAM 23 – Limptek Archive</title>
+  <meta charset="utf-8">
+  <title>TEKSTREAM 23 – LIMPTEK</title>
 
   <style>
     body {
@@ -13,67 +13,40 @@
       text-align: center;
     }
 
-    .logo {
+    img {
       margin: 20px 0;
       width: 220px;
-      max-width: 80%;
       filter: drop-shadow(0 0 12px rgba(0,255,0,0.25));
     }
 
-    #app {
-      margin-top: 40px;
+    iframe {
+      border: none;
+      width: 100%;
+      height: 500px;
+      margin-top: 30px;
     }
   </style>
 </head>
 
 <body>
 
-  <img
-    src="logo.png"
-    alt="LIMPTEK – Just a Soundsystem"
-    class="logo"
-  >
+  <img src="logo.png" alt="LIMPTEK">
 
   <h1>TEKSTREAM 23</h1>
   <p>vinyl only · live · no sync · no edits</p>
 
-  <div id="app"></div>
-
-  <!-- Webamp -->
-  <script src="https://unpkg.com/webamp"></script>
-
-  <script>
-    (async () => {
-      const item = "tekstream232311"; // archive.org Item-ID
-      const filesUrl = `https://archive.org/metadata/${item}/files`;
-
-      const response = await fetch(filesUrl);
-      const data = await response.json();
-
-      const tracks = data.result
-        .filter(file => file.name.endsWith(".mp3"))
-        .map(file => ({
-          metaData: {
-            artist: "LIMPTEK",
-            title: file.name.replace(".mp3", "")
-          },
-          url: `https://archive.org/download/${item}/${file.name}`
-        }));
-
-      const webamp = new window.Webamp({
-        initialTracks: tracks,
-        initialSkin: {
-          url: "https://archive.org/download/winampskin_base-2-91/base-2-91.wsz"
-        },
-        __butterchurnOptions: {
-          importButterchurn: () => import("https://unpkg.com/butterchurn"),
-          importPresets: () => import("https://unpkg.com/butterchurn-presets")
-        }
-      });
-
-      webamp.renderWhenReady(document.getElementById("app"));
-    })();
-  </script>
+  <!-- ARCHIVE.ORG PLAYER -->
+  <iframe
+    src="https://archive.org/embed/tekstream232311"
+    allowfullscreenstyle="
+      border: none;
+      width: 100%;
+      max-width: 900px;
+      height: 480px;
+      margin: 40px auto 0 auto;
+      display: block;
+    "
+  ></iframe>
 
 </body>
 </html>
