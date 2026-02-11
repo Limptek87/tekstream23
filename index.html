@@ -1,1 +1,64 @@
-<!doctype html> <html lang="de"> <head> <meta charset="utf-8"> <title>TEKSTREAM 23 – LIMPTEK</title> <style> body { margin: 0; background: black; color: #0f0; font-family: monospace; text-align: center; } img { margin: 20px 0; width: 220px; filter: drop-shadow(0 0 12px rgba(0,255,0,0.25)); } iframe { border: none; width: 100%; height: 500px; margin-top: 30px; } </style> </head> <body> <img src="logo.png" alt="LIMPTEK – Just a Soundsystem" class="logo"> <h1>TEKSTREAM 23</h1> <p>vinyl only · live · no sync · no edits</p> <!-- PLAYER --> <iframe src="https://archive.org/embed/tekstream232311" style=" border: none; width: 100%; max-width: 900px; height: 480px; margin: 40px auto 0 auto; display: block; " allowfullscreen ></iframe> </body> <div id="stats" style="margin-top:40px; font-size:14px; opacity:0.7;"> <div>Views: <span id="views">0</span></div> <div>Plays: <span id="plays">0</span></div> <div>Abgespielte Zeit: <span id="time">0</span> min</div> </div> <script> /* --- PAGE VIEWS --- */ let views = Number(localStorage.getItem("views") || 0) + 1; localStorage.setItem("views", views); document.getElementById("views").textContent = views; /* --- PLAY COUNT & TIME --- */ let plays = Number(localStorage.getItem("plays") || 0); let playedSeconds = Number(localStorage.getItem("playedSeconds") || 0); document.getElementById("plays").textContent = plays; document.getElementById("time").textContent = Math.floor(playedSeconds / 60); /* --- Webamp Hooks --- */ window.webamp.onPlay(() => { plays++; localStorage.setItem("plays", plays); document.getElementById("plays").textContent = plays; }); /* --- Time Counter --- */ <script> const audio = document.getElementById("player"); let plays = Number(localStorage.getItem("plays") || 0); let seconds = Number(localStorage.getItem("seconds") || 0); const playsEl = document.getElementById("plays"); const timeEl = document.getElementById("time"); playsEl.textContent = plays; function renderTime(sec) { const m = Math.floor(sec / 60); const s = sec % 60; timeEl.textContent = ${m}:${String(s).padStart(2,"0")}; } renderTime(seconds); audio.addEventListener("play", () => { plays++; localStorage.setItem("plays", plays); playsEl.textContent = plays; }); setInterval(() => { if (!audio.paused && !audio.ended) { seconds++; localStorage.setItem("seconds", seconds); renderTime(seconds); } }, 1000); </script> </script> </html>
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>TEKSTREAM 23 – LIMPTEK</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      color: #0f0;
+      font-family: monospace;
+      text-align: center;
+    }
+
+    img {
+      margin: 20px 0;
+      width: 220px;
+      filter: drop-shadow(0 0 12px rgba(0,255,0,0.25));
+    }
+
+    iframe {
+      border: none;
+      width: 100%;
+      max-width: 900px;
+      height: 480px;
+      margin: 40px auto;
+      display: block;
+    }
+
+    #stats {
+      margin-top: 40px;
+      font-size: 14px;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+
+<body>
+
+  <img src="logo.png" alt="LIMPTEK – Just a Soundsystem">
+
+  <h1>TEKSTREAM 23</h1>
+  <p>vinyl only · live · no sync · no edits</p>
+
+  <!-- Archive Player -->
+  <iframe
+    src="https://archive.org/embed/tekstream232311"
+    allowfullscreen>
+  </iframe>
+
+  <div id="stats">
+    <div>Views: <span id="views">0</span></div>
+  </div>
+
+  <!-- GoatCounter -->
+  <script
+    data-goatcounter="https://limptek23.goatcounter.com/count"
+    async
+    src="//gc.zgo.at/count.js">
+  </script>
+
+</body>
+</html>
