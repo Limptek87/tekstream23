@@ -43,29 +43,32 @@
   <h1>TEKSTREAM 23</h1>
   <p>vinyl only · live · no sync · no edits</p>
 
-  <!-- Archive Player -->
   <iframe
     src="https://archive.org/embed/tekstream232311"
     allowfullscreen>
   </iframe>
 
-  
-    
+  <div id="stats">
+    Gesamtbesuche: <span id="views">lädt...</span>
   </div>
 
-  <!-- GoatCounter -->
+  <!-- GoatCounter Tracking -->
   <script
     data-goatcounter="https://limptek23.goatcounter.com/count"
     async
-    src="//gc.zgo.at/count.js">
-    <script>
-fetch("https://limptek23.goatcounter.com/api/v0/stats/total")
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById("views").textContent = data.total;
-  });
-</script>
+    src="https://gc.zgo.at/count.js">
+  </script>
 
+  <!-- GoatCounter API Anzeige -->
+  <script>
+    fetch("https://limptek23.goatcounter.com/api/v0/stats/total")
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("views").textContent = data.total;
+      })
+      .catch(() => {
+        document.getElementById("views").textContent = "–";
+      });
   </script>
 
 </body>
