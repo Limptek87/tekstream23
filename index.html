@@ -49,8 +49,8 @@
     allowfullscreen>
   </iframe>
 
-  <div id="stats">
-    <div>Views: <span id="views">0</span></div>
+  
+    
   </div>
 
   <!-- GoatCounter -->
@@ -58,6 +58,14 @@
     data-goatcounter="https://limptek23.goatcounter.com/count"
     async
     src="//gc.zgo.at/count.js">
+    <script>
+fetch("https://limptek23.goatcounter.com/api/v0/stats/total")
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("views").textContent = data.total;
+  });
+</script>
+
   </script>
 
 </body>
