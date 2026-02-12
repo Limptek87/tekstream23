@@ -2,6 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TEKSTREAM 23 – LIMPTEK</title>
 
 <style>
@@ -11,6 +12,7 @@ body {
   color: #0f0;
   text-align: center;
   overflow-x: hidden;
+  background: black;
 }
 
 /* Background GIF */
@@ -18,7 +20,7 @@ body {
   position: fixed;
   inset: 0;
   background:
-    linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.85)),
+    linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)),
     url("intro.gif") center center no-repeat;
   background-size: contain;
   background-color: black;
@@ -29,26 +31,29 @@ body {
 .content {
   position: relative;
   z-index: 2;
-  padding-top: 60px;
+  padding: 80px 20px 40px 20px;
 }
 
 /* Logo */
 .logo {
   width: 220px;
-  margin: 20px 0;
+  max-width: 80%;
+  margin: 20px auto;
+  display: block;
   filter: drop-shadow(0 0 15px rgba(0,255,0,0.35));
 }
 
-/* PLAYER FIXED TOP RIGHT */
+/* ===== DESKTOP PLAYER (rechts oben) ===== */
 .player-box {
   position: fixed;
   top: 40px;
   right: 40px;
-  width: 420px;     /* kleiner */
-  height: 350px;    /* kompakter */
+  width: 420px;
+  height: 350px;
   z-index: 5;
   box-shadow: 0 0 25px rgba(0,255,0,0.15);
   border: 1px solid rgba(0,255,0,0.3);
+  background: black;
 }
 
 .player-box iframe {
@@ -62,6 +67,35 @@ body {
   margin-top: 40px;
   font-size: 14px;
   opacity: 0.7;
+}
+
+/* ===================== */
+/* ===== MOBILE ======== */
+/* ===================== */
+
+@media (max-width: 900px) {
+
+  .player-box {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: 100%;
+    max-width: 520px;
+    height: 420px;
+    margin: 40px auto;
+  }
+
+  .content {
+    padding-top: 40px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  p {
+    font-size: 14px;
+  }
 }
 </style>
 </head>
@@ -79,7 +113,7 @@ body {
 
 <div class="content">
 
-  <img src="logo.png" class="logo">
+  <img src="logo.png" class="logo" alt="LIMPTEK">
 
   <h1>TEKSTREAM 23</h1>
   <p>vinyl only · live · no sync · no edits</p>
