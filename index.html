@@ -27,11 +27,11 @@ body {
   z-index: -1;
 }
 
-/* ===== CENTER CONTENT ===== */
+/* Content center */
 .content {
   position: relative;
   z-index: 2;
-  padding: 120px 20px 40px 20px;
+  padding: 80px 20px 40px 20px;
 }
 
 /* Logo */
@@ -43,17 +43,17 @@ body {
   filter: drop-shadow(0 0 15px rgba(0,255,0,0.35));
 }
 
-/* ===== PLAYER LINKS OBEN ===== */
+/* ===== DESKTOP PLAYER (rechts oben) ===== */
 .player-box {
-  position: fixed;
+  position: auto;
   top: 40px;
-  left: 40px;
-  width: 360px;
-  height: 100px;
-  z-index: 10;
-  background: black;
+  right: 40px;
+  width: 350px;
+  height: 150px;
+  z-index: 5;
+  box-shadow: 0 0 25px rgba(0,255,0,0.15);
   border: 1px solid rgba(0,255,0,0.3);
-  box-shadow: 0 0 20px rgba(0,255,0,0.15);
+  background: black;
 }
 
 .player-box iframe {
@@ -62,57 +62,27 @@ body {
   border: none;
 }
 
-/* ===== STAR WARS PLAYLIST ===== */
-.playlist-box {
-  position: fixed;
-  left: -100px;
-  top: 30%;
-  width: 650px;
-  height: 70vh;
-  overflow-y: auto;
-  transform-origin: center top;
-  transform:
-    perspective(1400px)
-    rotateX(55deg)
-    rotateY(18deg);
-  z-index: 5;
+/* Stats */
+#stats {
+  margin-top: 40px;
+  font-size: 14px;
+  opacity: 0.7;
 }
 
-.playlist-box iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
+/* ===================== */
+/* ===== MOBILE ======== */
+/* ===================== */
 
-/* Subtle scrollbar */
-.playlist-box::-webkit-scrollbar {
-  width: 6px;
-}
-.playlist-box::-webkit-scrollbar-thumb {
-  background: rgba(0,255,0,0.3);
-}
-
-/* ===== MOBILE ===== */
 @media (max-width: 900px) {
 
   .player-box {
     position: relative;
     top: auto;
-    left: auto;
+    right: auto;
     width: 100%;
-    max-width: 420px;
-    height: 100px;
-    margin: 30px auto;
-  }
-
-  .playlist-box {
-    position: relative;
-    transform: none;
-    width: 100%;
-    height: 400px;
-    left: auto;
-    top: auto;
-    margin: 20px auto;
+    max-width: 400px;
+    height: 150px;
+    margin: 40px auto;
   }
 
   .content {
@@ -134,28 +104,43 @@ body {
 
 <div class="bg"></div>
 
-<!-- PLAYER -->
 <div class="player-box">
-  <iframe
-    src="https://archive.org/embed/tekstream232311"
-    allowfullscreen>
-  </iframe>
-</div>
-
-<!-- PLAYLIST -->
-<div class="playlist-box">
   <iframe
     src="https://archive.org/embed/tekstream232311?playlist=1"
     allowfullscreen>
   </iframe>
 </div>
 
-<!-- CENTER CONTENT -->
 <div class="content">
+
   <img src="logo.png" class="logo" alt="LIMPTEK">
+
   <h1>TEKSTREAM 23</h1>
   <p>vinyl only · live · no sync · no edits</p>
+
+  <div id="stats">
+    Gesamtbesuche: <span id="views">lädt...</span>
+  </div>
+
 </div>
 
+<!-- GoatCounter -->
+<script
+  data-goatcounter="https://limptek23.goatcounter.com/count"
+  async
+  src="https://gc.zgo.at/count.js">
+</script>
+
+<script>
+fetch("https://limptek23.goatcounter.com/api/v0/stats/total")
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("views").textContent = data.total;
+  })
+  .catch(() => {
+    document.getElementById("views").textContent = "–";
+  });
+</script>
+
 </body>
-</html>
+</html>   schreib mir bitte den index um und gesamtzahl  kansnt rausnehmen funktuniert eh ned 
