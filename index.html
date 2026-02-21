@@ -49,7 +49,7 @@ body {
   top: 40px;
   right: 40px;
   width: 350px;
-  height: 1500px;
+  height: 700px;
   z-index: 5;
   box-shadow: 0 0 25px rgba(0,255,0,0.15);
   border: 1px solid rgba(0,255,0,0.3);
@@ -116,11 +116,25 @@ body {
   <img src="logo.png" class="logo" alt="LIMPTEK">
 
   <h1>TEKSTREAM 23</h1>
-  <p>vinyl only · live · no sync · no edits</p>
+  <p>vinyl only · 23 · no sync · no edits</p>
+<script>
+    var t = setInterval(function() {
+        if (window.goatcounter && window.goatcounter.visit_count) {
+            clearInterval(t)
+            window.goatcounter.visit_count({append: 'body'})
+        }
+    }, 100)
+</script>
+<script data-goatcounter="https://limptek23.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
 
-  <div id="stats">
-    Gesamtbesuche: <span id="views">lädt...</span>
-  </div>
+  <script>
+    // Append to the <body>; can use a CSS selector to append somewhere else.
+    window.goatcounter.visit_count({append: 'body'})
+</script>
+<script data-goatcounter="https://limptek23.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
 
 </div>
 
