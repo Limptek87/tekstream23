@@ -26,26 +26,13 @@ body {
   z-index: -1;
 }
 
-/* CENTER CONTENT */
-.content {
-  position: relative;
-  z-index: 3;
-  padding: 120px 20px 40px 20px;
-}
-
-.logo {
-  width: 220px;
-  margin: 20px auto;
-  display: block;
-}
-
 /* PLAYER MITTIG */
 .player-box {
   position: fixed;
   top: 40px;
   left: 50%;
   transform: translateX(-50%);
-  width: 500px;
+  width: 520px;
   background: #111;
   padding: 15px;
   border: 1px solid #222;
@@ -71,25 +58,38 @@ button:hover {
   background: #333;
 }
 
-/* STAR WARS PLAYLIST PANEL */
+/* PLAYLIST – KORRIGIERT */
 .playlist-box {
   position: fixed;
-  left: -120px;
-  top: 30%;
-  width: 700px;
-  height: 70vh;
-  transform-origin: center top;
-  transform:
-    perspective(1600px)
-    rotateX(60deg)
-    rotateY(22deg);
+  left: 50%;
+  top: 220px;
+  transform: translateX(-50%)
+             perspective(1400px)
+             rotateX(40deg)
+             rotateY(12deg);
+  width: 800px;
+  height: 500px;
   z-index: 2;
+  pointer-events: auto;
 }
 
 .playlist-box iframe {
   width: 100%;
   height: 100%;
   border: none;
+}
+
+/* CONTENT */
+.content {
+  position: relative;
+  margin-top: 760px;
+  padding-bottom: 80px;
+}
+
+.logo {
+  width: 200px;
+  margin: 20px auto;
+  display: block;
 }
 
 /* MOBILE */
@@ -106,10 +106,15 @@ button:hover {
   .playlist-box {
     position: relative;
     transform: none;
-    width: 100%;
+    width: 95%;
     height: 400px;
-    left: auto;
     margin: 20px auto;
+    left: auto;
+    top: auto;
+  }
+
+  .content {
+    margin-top: 20px;
   }
 
 }
@@ -130,12 +135,12 @@ button:hover {
   </div>
 </div>
 
-<!-- PLAYLIST VISUAL PANEL -->
+<!-- PLAYLIST -->
 <div class="playlist-box">
   <iframe src="https://archive.org/embed/tekstream232311?playlist=1"></iframe>
 </div>
 
-<!-- CENTER -->
+<!-- CONTENT -->
 <div class="content">
   <img src="logo.png" class="logo" alt="LIMPTEK">
   <h1>TEKSTREAM 23</h1>
@@ -146,11 +151,10 @@ button:hover {
 const item = "tekstream232311";
 const baseURL = `https://archive.org/download/${item}/`;
 
-/* Liste deiner Tracks hier eintragen (MP3 empfohlen) */
+/* DEINE DATEINAMEN HIER EINTRAGEN */
 const tracks = [
   "LAST MIX.mp3",
   "darkforestmix.mp3"
-  // weitere Dateien hier ergänzen
 ];
 
 let autoplayEnabled = true;
@@ -175,7 +179,7 @@ audio.addEventListener("ended", () => {
   if (autoplayEnabled) playRandom();
 });
 
-/* Browser Autoplay-Schutz → startet nach erster Interaktion */
+/* Autoplay startet nach erster Interaktion (Browser-Schutz) */
 window.addEventListener("click", function init() {
   playRandom();
   window.removeEventListener("click", init);
