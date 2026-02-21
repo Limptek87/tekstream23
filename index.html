@@ -2,32 +2,88 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Winamp Test</title>
+<title>TEKSTREAM 23 – Just </title>
 <script src="https://unpkg.com/webamp@latest/built/webamp.bundle.min.js"></script>
+
 <style>
 html, body {
   margin: 0;
+  padding: 0;
   background: black;
-  height: 100%;
+  overflow: hidden;
+}
+
+/* leichte CRT Scanlines */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    rgba(0,0,0,0.2) 0px,
+    rgba(0,0,0,0.2) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
 }
 </style>
 </head>
+
 <body>
 
 <script>
 window.addEventListener("load", function () {
 
+  const item = "tekstream232311";
+  const baseURL = `https://archive.org/download/${item}/`;
+
+  const tracks = [
+    {
+      metaData: { artist: "LIMPTEK", title: "LAST MIX" },
+      url: baseURL + "LAST%20MIX.mp3"
+    },
+    {
+      metaData: { artist: "LIMPTEK", title: "darkforestmix" },
+      url: baseURL + "darkforestmix.mp3"
+    }
+  ];
+
   const webamp = new Webamp({
-    initialTracks: [
-      {
-        metaData: { artist: "Demo", title: "Test Track" },
-        url: "https://archive.org/download/testmp3testfile/mpthreetest.mp3"
+    initialTracks: tracks,
+
+    initialSkin: {
+      url: "https://cdn.jsdelivr.net/gh/captbaritone/webamp@master/skins/base-2.91.wsz"
+    },
+
+    windowLayout: {
+      main: {
+        position: { x: window.innerWidth / 2 - 150, y: 80 }
+      },
+      equalizer: {
+        position: { x: window.innerWidth / 2 - 150, y: 196 }
+      },
+      playlist: {
+        position: { x: window.innerWidth / 2 + 120, y: 80 }
+      },
+      milkdrop: {
+        position: { x: 0, y: 0 },
+        size: { width: window.innerWidth, height: window.innerHeight }
       }
-    ]
+    }
   });
 
   webamp.renderWhenReady(document.body).then(() => {
+
+    webamp.setShuffle(true);
+    webamp.setRepeat(true);
+
     webamp.play();
+
+    // Milkdrop Fullscreen
+    webamp.store.dispatch({
+      type: "TOGGLE_MILKDROP"
+    });
+
   });
 
 });
