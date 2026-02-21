@@ -9,7 +9,7 @@
 body {
   margin: 0;
   font-family: monospace;
-  color: #00ff66;
+  color: white;
   text-align: center;
   background: black;
   overflow-x: hidden;
@@ -20,111 +20,70 @@ body {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(circle at center, rgba(0,255,100,0.08), transparent 60%),
-    linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.95)),
+    linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.95)),
     url("intro.gif") center center no-repeat;
   background-size: contain;
-  z-index: -3;
+  z-index: -1;
 }
 
-/* FOG */
-.fog {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle at 50% 40%, rgba(0,255,120,0.05), transparent 70%);
-  animation: fogMove 12s ease-in-out infinite alternate;
-  z-index: -2;
-}
-
-@keyframes fogMove {
-  from { transform: scale(1) translateY(0px); }
-  to   { transform: scale(1.1) translateY(-20px); }
-}
-
-/* CONTENT */
+/* CENTER CONTENT */
 .content {
   position: relative;
-  z-index: 5;
-  padding: 140px 20px 40px 20px;
+  z-index: 3;
+  padding: 120px 20px 40px 20px;
 }
 
 .logo {
-  width: 240px;
-  max-width: 80%;
+  width: 220px;
   margin: 20px auto;
   display: block;
-  filter:
-    drop-shadow(0 0 25px rgba(0,255,120,0.5))
-    drop-shadow(0 0 60px rgba(0,255,120,0.2));
 }
 
-h1 {
-  letter-spacing: 4px;
-  text-shadow:
-    0 0 10px rgba(0,255,120,0.7),
-    0 0 30px rgba(0,255,120,0.3);
-}
-
-p {
-  opacity: 0.8;
-  letter-spacing: 2px;
-}
-
-/* PLAYER */
+/* PLAYER MITTIG */
 .player-box {
   position: fixed;
   top: 40px;
-  left: 40px;
-  width: 380px;
-  height: 100px;
-  background: rgba(0,0,0,0.85);
-  border: 1px solid rgba(0,255,120,0.4);
-  box-shadow:
-    0 0 30px rgba(0,255,120,0.15),
-    inset 0 0 20px rgba(0,255,120,0.1);
-  backdrop-filter: blur(6px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  background: #111;
+  padding: 15px;
+  border: 1px solid #222;
   z-index: 10;
 }
 
-.player-box iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
 }
 
-/* PLAYLIST */
+button {
+  background: #222;
+  border: 1px solid #333;
+  color: white;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #333;
+}
+
+/* STAR WARS PLAYLIST PANEL */
 .playlist-box {
   position: fixed;
   left: -120px;
-  top: 28%;
+  top: 30%;
   width: 700px;
-  height: 75vh;
-  overflow-y: auto;
+  height: 70vh;
   transform-origin: center top;
   transform:
     perspective(1600px)
     rotateX(60deg)
     rotateY(22deg);
-  background: rgba(0,0,0,0.75);
-  border: 1px solid rgba(0,255,120,0.25);
-  box-shadow:
-    0 0 60px rgba(0,255,120,0.2),
-    inset 0 0 40px rgba(0,255,120,0.08);
-  backdrop-filter: blur(8px);
-  animation: pulse 6s ease-in-out infinite;
-  z-index: 4;
-}
-
-@keyframes pulse {
-  0% { box-shadow:
-        0 0 40px rgba(0,255,120,0.15),
-        inset 0 0 30px rgba(0,255,120,0.05); }
-  50% { box-shadow:
-        0 0 70px rgba(0,255,120,0.3),
-        inset 0 0 60px rgba(0,255,120,0.12); }
-  100% { box-shadow:
-        0 0 40px rgba(0,255,120,0.15),
-        inset 0 0 30px rgba(0,255,120,0.05); }
+  z-index: 2;
 }
 
 .playlist-box iframe {
@@ -138,22 +97,21 @@ p {
 
   .player-box {
     position: relative;
-    width: 100%;
-    max-width: 420px;
-    margin: 30px auto;
+    transform: none;
+    left: auto;
+    width: 90%;
+    margin: 20px auto;
   }
 
   .playlist-box {
     position: relative;
     transform: none;
     width: 100%;
-    height: 420px;
+    height: 400px;
+    left: auto;
     margin: 20px auto;
   }
 
-  .content {
-    padding-top: 40px;
-  }
 }
 </style>
 </head>
@@ -161,32 +119,67 @@ p {
 <body>
 
 <div class="bg"></div>
-<div class="fog"></div>
 
+<!-- PLAYER -->
 <div class="player-box">
-  <iframe id="mainPlayer" allow="autoplay" allowfullscreen></iframe>
+  <audio id="audioPlayer" controls style="width:100%"></audio>
+
+  <div class="controls">
+    <button onclick="shuffleTrack()">Shuffle</button>
+    <button onclick="toggleAutoplay()">Autoplay: <span id="autoState">On</span></button>
+  </div>
 </div>
 
+<!-- PLAYLIST VISUAL PANEL -->
 <div class="playlist-box">
-  <iframe src="https://archive.org/embed/tekstream232311?playlist=1" allowfullscreen></iframe>
+  <iframe src="https://archive.org/embed/tekstream232311?playlist=1"></iframe>
 </div>
 
+<!-- CENTER -->
 <div class="content">
   <img src="logo.png" class="logo" alt="LIMPTEK">
   <h1>TEKSTREAM 23</h1>
-  <p>vinyl only · 23 · no sync · no edits</p>
+  <p>vinyl only · live · no sync · no edits</p>
 </div>
 
 <script>
 const item = "tekstream232311";
+const baseURL = `https://archive.org/download/${item}/`;
 
-/* Zufälliger Track Index 0–39 (wenn du 40 Tracks hast → anpassen!) */
-const totalTracks = 40; 
-const randomIndex = Math.floor(Math.random() * totalTracks);
+/* Liste deiner Tracks hier eintragen (MP3 empfohlen) */
+const tracks = [
+  "LAST MIX.mp3",
+  "darkforestmix.mp3"
+  // weitere Dateien hier ergänzen
+];
 
-/* Embed mit Playlist + Track + Autoplay */
-document.getElementById("mainPlayer").src =
-  `https://archive.org/embed/${item}?playlist=1#track=${randomIndex}&autoplay=1`;
+let autoplayEnabled = true;
+const audio = document.getElementById("audioPlayer");
+
+function playRandom() {
+  const randomIndex = Math.floor(Math.random() * tracks.length);
+  audio.src = baseURL + encodeURIComponent(tracks[randomIndex]);
+  audio.play();
+}
+
+function shuffleTrack() {
+  playRandom();
+}
+
+function toggleAutoplay() {
+  autoplayEnabled = !autoplayEnabled;
+  document.getElementById("autoState").textContent = autoplayEnabled ? "On" : "Off";
+}
+
+audio.addEventListener("ended", () => {
+  if (autoplayEnabled) playRandom();
+});
+
+/* Browser Autoplay-Schutz → startet nach erster Interaktion */
+window.addEventListener("click", function init() {
+  playRandom();
+  window.removeEventListener("click", init);
+});
 </script>
 
 </body>
