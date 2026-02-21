@@ -146,14 +146,20 @@ body {
 </script>
 
 <script>
+<div id="viewBox">
+  <span id="views">0</span>
+</div>
+
+<script>
 fetch("https://limptek23.goatcounter.com/api/v0/stats/total")
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById("views").textContent = data.total;
+  .then(r => r.json())
+  .then(d => {
+    document.getElementById("views").textContent = d.total;
   })
   .catch(() => {
     document.getElementById("views").textContent = "–";
   });
+</script>
 </script>
 
 </body>
