@@ -1,82 +1,35 @@
 <!doctype html>
-<html lang="de">
+<html>
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TEKSTREAM 23 – 1999 UNDERGROUND</title>
-
+<title>Winamp Test</title>
+<script src="https://unpkg.com/webamp@latest/built/webamp.bundle.min.js"></script>
 <style>
 html, body {
   margin: 0;
-  padding: 0;
   background: black;
-  overflow: hidden;
-}
-
-/* leichtes CRT Feeling */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: repeating-linear-gradient(
-    rgba(0,0,0,0.2) 0px,
-    rgba(0,0,0,0.2) 1px,
-    transparent 1px,
-    transparent 3px
-  );
-  pointer-events: none;
-  mix-blend-mode: multiply;
+  height: 100%;
 }
 </style>
-
-<script src="https://unpkg.com/webamp"></script>
 </head>
-
 <body>
 
 <script>
-const item = "tekstream232311";
-const baseURL = `https://archive.org/download/${item}/`;
+window.addEventListener("load", function () {
 
-/* === DEINE TRACKS HIER EINTRAGEN === */
-const tracks = [
-  {
-    metaData: { artist: "LIMPTEK", title: "LAST MIX" },
-    url: baseURL + "LAST%20MIX.mp3"
-  },
-  {
-    metaData: { artist: "LIMPTEK", title: "darkforestmix" },
-    url: baseURL + "darkforestmix.mp3"
-  }
-];
+  const webamp = new Webamp({
+    initialTracks: [
+      {
+        metaData: { artist: "Demo", title: "Test Track" },
+        url: "https://archive.org/download/testmp3testfile/mpthreetest.mp3"
+      }
+    ]
+  });
 
-const webamp = new Webamp({
+  webamp.renderWhenReady(document.body).then(() => {
+    webamp.play();
+  });
 
-  initialTracks: tracks,
-
-  initialSkin: {
-    url: "https://cdn.jsdelivr.net/gh/captbaritone/webamp@master/skins/base-2.91.wsz"
-  },
-
-  /* Fenster Positionen */
-  windowLayout: {
-    main: { position: { x: 80, y: 60 } },
-    equalizer: { position: { x: 80, y: 176 } },
-    playlist: { position: { x: 380, y: 60 } }
-  }
-});
-
-/* Render */
-webamp.renderWhenReady(document.body).then(() => {
-
-  /* Milkdrop aktivieren */
-  webamp.setMilkdrop(true);
-
-  /* Shuffle aktiv */
-  webamp.setShuffle(true);
-
-  /* Autoplay */
-  webamp.play();
 });
 </script>
 
