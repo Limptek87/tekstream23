@@ -1,70 +1,200 @@
 <!doctype html>
-<html>
+<html lang="de">
 <head>
 <meta charset="utf-8">
-<title>TEKSTREAM 23 – JUST </title>
-<script src="https://unpkg.com/webamp@latest/built/webamp.bundle.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TEKSTREAM 23 – LIMPTEK</title>
 
 <style>
-html, body {
+body {
   margin: 0;
-  padding: 0;
+  font-family: monospace;
+  color: #00ff66;
+  text-align: center;
   background: black;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
-body::after {
-  content: "";
+/* ===== BACKGROUND ===== */
+.bg {
   position: fixed;
   inset: 0;
-  background: repeating-linear-gradient(
-    rgba(0,0,0,0.2) 0px,
-    rgba(0,0,0,0.2) 1px,
-    transparent 1px,
-    transparent 3px
-  );
-  pointer-events: none;
+  background:
+    radial-gradient(circle at center, rgba(0,255,100,0.08), transparent 60%),
+    linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.95)),
+    url("intro.gif") center center no-repeat;
+  background-size: contain;
+  background-color: black;
+  z-index: -3;
+}
+
+/* Fog Layer */
+.fog {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 40%, rgba(0,255,120,0.05), transparent 70%);
+  animation: fogMove 12s ease-in-out infinite alternate;
+  z-index: -2;
+}
+
+@keyframes fogMove {
+  from { transform: scale(1) translateY(0px); }
+  to   { transform: scale(1.1) translateY(-20px); }
+}
+
+/* ===== CENTER CONTENT ===== */
+.content {
+  position: relative;
+  z-index: 5;
+  padding: 140px 20px 40px 20px;
+}
+
+.logo {
+  width: 240px;
+  max-width: 80%;
+  margin: 20px auto;
+  display: block;
+  filter:
+    drop-shadow(0 0 25px rgba(0,255,120,0.5))
+    drop-shadow(0 0 60px rgba(0,255,120,0.2));
+}
+
+h1 {
+  letter-spacing: 4px;
+  text-shadow:
+    0 0 10px rgba(0,255,120,0.7),
+    0 0 30px rgba(0,255,120,0.3);
+}
+
+p {
+  opacity: 0.8;
+  letter-spacing: 2px;
+}
+
+/* ===== PLAYER (LINKS OBEN) ===== */
+.player-box {
+  position: fixed;
+  top: 40px;
+  left: 40px;
+  width: 380px;
+  height: 100px;
+  background: rgba(0,0,0,0.8);
+  border: 1px solid rgba(0,255,120,0.4);
+  box-shadow:
+    0 0 30px rgba(0,255,120,0.15),
+    inset 0 0 20px rgba(0,255,120,0.1);
+  backdrop-filter: blur(6px);
+  z-index: 10;
+}
+
+.player-box iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* ===== DYSTOPIA PLAYLIST ===== */
+.playlist-box {
+  position: fixed;
+  left: -120px;
+  top: 28%;
+  width: 700px;
+  height: 75vh;
+  overflow-y: auto;
+
+  transform-origin: center top;
+  transform:
+    perspective(1600px)
+    rotateX(60deg)
+    rotateY(22deg);
+
+  background: rgba(0,0,0,0.75);
+  border: 1px solid rgba(0,255,120,0.25);
+
+  box-shadow:
+    0 0 60px rgba(0,255,120,0.2),
+    inset 0 0 40px rgba(0,255,120,0.08);
+
+  backdrop-filter: blur(8px);
+
+  animation: pulse 6s ease-in-out infinite;
+  z-index: 4;
+}
+
+@keyframes pulse {
+  0% { box-shadow:
+        0 0 40px rgba(0,255,120,0.15),
+        inset 0 0 30px rgba(0,255,120,0.05); }
+  50% { box-shadow:
+        0 0 70px rgba(0,255,120,0.3),
+        inset 0 0 60px rgba(0,255,120,0.12); }
+  100% { box-shadow:
+        0 0 40px rgba(0,255,120,0.15),
+        inset 0 0 30px rgba(0,255,120,0.05); }
+}
+
+.playlist-box iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Scrollbar */
+.playlist-box::-webkit-scrollbar {
+  width: 6px;
+}
+.playlist-box::-webkit-scrollbar-thumb {
+  background: rgba(0,255,120,0.4);
+}
+
+/* ===== MOBILE CLEAN MODE ===== */
+@media (max-width: 900px) {
+
+  .player-box {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    max-width: 420px;
+    margin: 30px auto;
+  }
+
+  .playlist-box {
+    position: relative;
+    transform: none;
+    width: 100%;
+    height: 420px;
+    left: auto;
+    top: auto;
+    margin: 20px auto;
+  }
+
+  .content {
+    padding-top: 40px;
+  }
+
 }
 </style>
 </head>
 
 <body>
 
-<script>
-window.addEventListener("load", function () {
+<div class="bg"></div>
+<div class="fog"></div>
 
-  const item = "tekstream232311";
-  const baseURL = `https://archive.org/download/${item}/`;
+<div class="player-box">
+  <iframe src="https://archive.org/embed/tekstream232311" allowfullscreen></iframe>
+</div>
 
-  const tracks = [
-    {
-      metaData: { artist: "LIMPTEK", title: "LAST MIX" },
-      url: baseURL + "LAST%20MIX.mp3"
-    },
-    {
-      metaData: { artist: "LIMPTEK", title: "darkforestmix" },
-      url: baseURL + "darkforestmix.mp3"
-    }
-  ];
+<div class="playlist-box">
+  <iframe src="https://archive.org/embed/tekstream232311?playlist=1" allowfullscreen></iframe>
+</div>
 
-  const webamp = new Webamp({
-    initialTracks: tracks,
-
-    windowLayout: {
-      main: { position: { x: window.innerWidth/2 - 150, y: 80 } },
-      equalizer: { position: { x: window.innerWidth/2 - 150, y: 196 } },
-      playlist: { position: { x: window.innerWidth/2 + 120, y: 80 } }
-    }
-  });
-
-  webamp.renderWhenReady(document.body).then(() => {
-    webamp.setShuffle(true);
-    webamp.setRepeat(true);
-    webamp.play();
-  });
-
-});
-</script>
+<div class="content">
+  <img src="logo.png" class="logo" alt="LIMPTEK">
+  <h1>TEKSTREAM 23</h1>
+  <p>vinyl only · live · no sync · no edits</p>
+</div>
 
 </body>
-</html>
+</html>                 bau mir das sript für den züfälligen start ein 
