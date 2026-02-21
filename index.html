@@ -9,51 +9,81 @@
 body {
   margin: 0;
   font-family: monospace;
-  color: #0f0;
+  color: #00ff66;
   text-align: center;
-  overflow-x: hidden;
   background: black;
+  overflow-x: hidden;
 }
 
-/* Background GIF */
+/* BACKGROUND */
 .bg {
   position: fixed;
   inset: 0;
   background:
-    linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)),
+    radial-gradient(circle at center, rgba(0,255,100,0.08), transparent 60%),
+    linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.95)),
     url("intro.gif") center center no-repeat;
   background-size: contain;
-  background-color: black;
-  z-index: -1;
+  z-index: -3;
 }
 
-/* Content center */
+/* FOG */
+.fog {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 40%, rgba(0,255,120,0.05), transparent 70%);
+  animation: fogMove 12s ease-in-out infinite alternate;
+  z-index: -2;
+}
+
+@keyframes fogMove {
+  from { transform: scale(1) translateY(0px); }
+  to   { transform: scale(1.1) translateY(-20px); }
+}
+
+/* CONTENT */
 .content {
   position: relative;
-  z-index: 2;
-  padding: 80px 20px 40px 20px;
+  z-index: 5;
+  padding: 140px 20px 40px 20px;
 }
 
-/* Logo */
 .logo {
-  width: 220px;
+  width: 240px;
   max-width: 80%;
   margin: 20px auto;
   display: block;
-  filter: drop-shadow(0 0 15px rgba(0,255,0,0.35));
+  filter:
+    drop-shadow(0 0 25px rgba(0,255,120,0.5))
+    drop-shadow(0 0 60px rgba(0,255,120,0.2));
 }
 
-/* ===== DESKTOP PLAYER (rechts oben) ===== */
+h1 {
+  letter-spacing: 4px;
+  text-shadow:
+    0 0 10px rgba(0,255,120,0.7),
+    0 0 30px rgba(0,255,120,0.3);
+}
+
+p {
+  opacity: 0.8;
+  letter-spacing: 2px;
+}
+
+/* PLAYER */
 .player-box {
-  position: auto;
+  position: fixed;
   top: 40px;
-  right: 40px;
-  width: 350px;
-  height: 150px;
-  z-index: 5;
-  box-shadow: 0 0 25px rgba(0,255,0,0.15);
-  border: 1px solid rgba(0,255,0,0.3);
-  background: black;
+  left: 40px;
+  width: 380px;
+  height: 100px;
+  background: rgba(0,0,0,0.85);
+  border: 1px solid rgba(0,255,120,0.4);
+  box-shadow:
+    0 0 30px rgba(0,255,120,0.15),
+    inset 0 0 20px rgba(0,255,120,0.1);
+  backdrop-filter: blur(6px);
+  z-index: 10;
 }
 
 .player-box iframe {
@@ -62,39 +92,67 @@ body {
   border: none;
 }
 
-/* Stats */
-#stats {
-  margin-top: 40px;
-  font-size: 14px;
-  opacity: 0.7;
+/* PLAYLIST */
+.playlist-box {
+  position: fixed;
+  left: -120px;
+  top: 28%;
+  width: 700px;
+  height: 75vh;
+  overflow-y: auto;
+  transform-origin: center top;
+  transform:
+    perspective(1600px)
+    rotateX(60deg)
+    rotateY(22deg);
+  background: rgba(0,0,0,0.75);
+  border: 1px solid rgba(0,255,120,0.25);
+  box-shadow:
+    0 0 60px rgba(0,255,120,0.2),
+    inset 0 0 40px rgba(0,255,120,0.08);
+  backdrop-filter: blur(8px);
+  animation: pulse 6s ease-in-out infinite;
+  z-index: 4;
 }
 
-/* ===================== */
-/* ===== MOBILE ======== */
-/* ===================== */
+@keyframes pulse {
+  0% { box-shadow:
+        0 0 40px rgba(0,255,120,0.15),
+        inset 0 0 30px rgba(0,255,120,0.05); }
+  50% { box-shadow:
+        0 0 70px rgba(0,255,120,0.3),
+        inset 0 0 60px rgba(0,255,120,0.12); }
+  100% { box-shadow:
+        0 0 40px rgba(0,255,120,0.15),
+        inset 0 0 30px rgba(0,255,120,0.05); }
+}
 
+.playlist-box iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* MOBILE */
 @media (max-width: 900px) {
 
   .player-box {
     position: relative;
-    top: auto;
-    right: auto;
     width: 100%;
-    max-width: 400px;
-    height: 150px;
-    margin: 40px auto;
+    max-width: 420px;
+    margin: 30px auto;
+  }
+
+  .playlist-box {
+    position: relative;
+    transform: none;
+    width: 100%;
+    height: 420px;
+    margin: 20px auto;
   }
 
   .content {
     padding-top: 40px;
-  }
-
-  h1 {
-    font-size: 24px;
-  }
-
-  p {
-    font-size: 14px;
   }
 }
 </style>
@@ -103,43 +161,32 @@ body {
 <body>
 
 <div class="bg"></div>
+<div class="fog"></div>
 
 <div class="player-box">
-  <iframe
-    src="https://archive.org/embed/tekstream232311?playlist=1"
-    allowfullscreen>
-  </iframe>
+  <iframe id="mainPlayer" allow="autoplay" allowfullscreen></iframe>
+</div>
+
+<div class="playlist-box">
+  <iframe src="https://archive.org/embed/tekstream232311?playlist=1" allowfullscreen></iframe>
 </div>
 
 <div class="content">
-
   <img src="logo.png" class="logo" alt="LIMPTEK">
-
   <h1>TEKSTREAM 23</h1>
-  <p>vinyl only · live · no sync · no edits</p>
-
-  <div id="stats">
-    Gesamtbesuche: <span id="views">lädt...</span>
-  </div>
-
+  <p>vinyl only · 23 · no sync · no edits</p>
 </div>
 
-<!-- GoatCounter -->
-<script
-  data-goatcounter="https://limptek23.goatcounter.com/count"
-  async
-  src="https://gc.zgo.at/count.js">
-</script>
-
 <script>
-fetch("https://limptek23.goatcounter.com/api/v0/stats/total")
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById("views").textContent = data.total;
-  })
-  .catch(() => {
-    document.getElementById("views").textContent = "–";
-  });
+const item = "tekstream232311";
+
+/* Zufälliger Track Index 0–39 (wenn du 40 Tracks hast → anpassen!) */
+const totalTracks = 40; 
+const randomIndex = Math.floor(Math.random() * totalTracks);
+
+/* Embed mit Playlist + Track + Autoplay */
+document.getElementById("mainPlayer").src =
+  `https://archive.org/embed/${item}?playlist=1#track=${randomIndex}&autoplay=1`;
 </script>
 
 </body>
