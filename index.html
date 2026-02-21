@@ -3,186 +3,80 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TEKSTREAM 23 – LIMPTEK</title>
+<title>TEKSTREAM 23 – 1999 UNDERGROUND</title>
 
 <style>
-body {
+html, body {
   margin: 0;
-  font-family: monospace;
-  color: #00ff66;
-  text-align: center;
+  padding: 0;
   background: black;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
-/* BACKGROUND */
-.bg {
+/* leichtes CRT Feeling */
+body::after {
+  content: "";
   position: fixed;
   inset: 0;
-  background:
-    linear-gradient(rgba(0,0,0,0.95), rgba(0,0,0,0.98)),
-    url("intro.gif") center center no-repeat;
-  background-size: contain;
-  z-index: -1;
-}
-
-/* TITLE SECTION */
-.content {
-  margin-top: 160px;
-}
-
-h1 {
-  font-size: 28px;
-  letter-spacing: 4px;
-  margin-bottom: 10px;
-}
-
-/* LOGO – 50% kleiner */
-.logo {
-  width: 100px;
-  margin: 10px auto;
-  display: block;
-  filter: brightness(0) saturate(100%) invert(66%) sepia(99%) saturate(400%) hue-rotate(90deg);
-}
-
-p {
-  font-size: 13px;
-  letter-spacing: 2px;
-  opacity: 0.8;
-}
-
-/* PLAYER – KEIN BACKGROUND */
-.player-box {
-  position: fixed;
-  top: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 500px;
-  z-index: 10;
-}
-
-audio {
-  width: 100%;
-  filter: invert(100%) hue-rotate(70deg) brightness(1.4);
-  background: transparent;
-}
-
-.controls {
-  margin-top: 8px;
-}
-
-button {
-  background: transparent;
-  border: 1px solid #00ff66;
-  color: #00ff66;
-  padding: 4px 10px;
-  margin: 0 5px;
-  cursor: pointer;
-  font-family: monospace;
-}
-
-button:hover {
-  background: #00ff66;
-  color: black;
-}
-
-/* PLAYLIST – CLEAN & MITTIG */
-.playlist-box {
-  margin-top: 120px;
-  display: flex;
-  justify-content: center;
-}
-
-.playlist-box iframe {
-  width: 900px;
-  height: 420px;
-  border: none;
-  background: transparent;
-  filter: invert(100%) hue-rotate(70deg) brightness(1.2);
-}
-
-/* MOBILE */
-@media (max-width: 900px) {
-
-  .player-box {
-    position: relative;
-    transform: none;
-    left: auto;
-    width: 90%;
-    margin: 20px auto;
-  }
-
-  .playlist-box iframe {
-    width: 95%;
-    height: 380px;
-  }
-
+  background: repeating-linear-gradient(
+    rgba(0,0,0,0.2) 0px,
+    rgba(0,0,0,0.2) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  mix-blend-mode: multiply;
 }
 </style>
+
+<script src="https://unpkg.com/webamp"></script>
 </head>
 
 <body>
-
-<div class="bg"></div>
-
-<!-- PLAYER -->
-<div class="player-box">
-  <audio id="audioPlayer" controls></audio>
-
-  <div class="controls">
-    <button onclick="shuffleTrack()">Shuffle</button>
-    <button onclick="toggleAutoplay()">Autoplay: <span id="autoState">On</span></button>
-  </div>
-</div>
-
-<!-- TITLE -->
-<div class="content">
-  <h1>TEKSTREAM 23</h1>
-  <img src="logo.png" class="logo" alt="LIMPTEK">
-  <p>vinyl only · 23 · no sync · no edits</p>
-</div>
-
-<!-- PLAYLIST -->
-<div class="playlist-box">
-  <iframe src="https://archive.org/embed/tekstream232311?playlist=1"></iframe>
-</div>
 
 <script>
 const item = "tekstream232311";
 const baseURL = `https://archive.org/download/${item}/`;
 
-/* DEINE TRACKS HIER EINTRAGEN */
+/* === DEINE TRACKS HIER EINTRAGEN === */
 const tracks = [
-  "LAST MIX.mp3",
-  "darkforestmix.mp3"
+  {
+    metaData: { artist: "LIMPTEK", title: "LAST MIX" },
+    url: baseURL + "LAST%20MIX.mp3"
+  },
+  {
+    metaData: { artist: "LIMPTEK", title: "darkforestmix" },
+    url: baseURL + "darkforestmix.mp3"
+  }
 ];
 
-let autoplayEnabled = true;
-const audio = document.getElementById("audioPlayer");
+const webamp = new Webamp({
 
-function playRandom() {
-  const randomIndex = Math.floor(Math.random() * tracks.length);
-  audio.src = baseURL + encodeURIComponent(tracks[randomIndex]);
-  audio.play();
-}
+  initialTracks: tracks,
 
-function shuffleTrack() {
-  playRandom();
-}
+  initialSkin: {
+    url: "https://cdn.jsdelivr.net/gh/captbaritone/webamp@master/skins/base-2.91.wsz"
+  },
 
-function toggleAutoplay() {
-  autoplayEnabled = !autoplayEnabled;
-  document.getElementById("autoState").textContent = autoplayEnabled ? "On" : "Off";
-}
-
-audio.addEventListener("ended", () => {
-  if (autoplayEnabled) playRandom();
+  /* Fenster Positionen */
+  windowLayout: {
+    main: { position: { x: 80, y: 60 } },
+    equalizer: { position: { x: 80, y: 176 } },
+    playlist: { position: { x: 380, y: 60 } }
+  }
 });
 
-/* Autoplay nach erster Interaktion */
-window.addEventListener("click", function init() {
-  playRandom();
-  window.removeEventListener("click", init);
+/* Render */
+webamp.renderWhenReady(document.body).then(() => {
+
+  /* Milkdrop aktivieren */
+  webamp.setMilkdrop(true);
+
+  /* Shuffle aktiv */
+  webamp.setShuffle(true);
+
+  /* Autoplay */
+  webamp.play();
 });
 </script>
 
