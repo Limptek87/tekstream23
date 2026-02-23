@@ -2,17 +2,52 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<title>TEKSTREAM – LIMPTEK</title>
+<title>TEKSTREAM 23 – LIMPTEK</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-html,body{margin:0;height:100%;background:black;color:#0f0;font-family:monospace;overflow:hidden}
-#viz{position:fixed;inset:0;z-index:-1}
-#ui{position:absolute;top:20px;left:50%;transform:translateX(-50%);text-align:center}
+html,body{
+margin:0;height:100%;background:black;color:#0f0;
+font-family:monospace;overflow:hidden
+}
 
-audio{width:320px;filter:invert(1) hue-rotate(90deg);opacity:.85}
+#viz{
+position:fixed;
+inset:0;
+z-index:-2;
+}
 
-.logo{width:110px;margin:14px auto;display:block}
+#ui{
+position:absolute;
+top:18px;
+left:50%;
+transform:translateX(-50%);
+text-align:center;
+}
+
+.logo{
+width:100px;
+margin-bottom:10px;
+}
+
+h1{
+margin:6px 0;
+font-size:34px;
+letter-spacing:3px;
+text-shadow:0 0 15px #0f0;
+}
+
+.subtitle{
+font-size:14px;
+opacity:.8;
+margin-bottom:10px;
+}
+
+audio{
+width:340px;
+filter:invert(1) hue-rotate(90deg);
+margin-bottom:6px;
+}
 
 .controls button{
 background:black;
@@ -21,7 +56,7 @@ border:1px solid #0f0;
 padding:6px 12px;
 margin:4px;
 cursor:pointer;
-box-shadow:0 0 10px #0f0;
+box-shadow:0 0 12px #0f0;
 }
 
 .controls button.active{
@@ -29,7 +64,32 @@ background:#0f0;
 color:black;
 }
 
-#track{margin-top:6px;font-size:13px;opacity:.8}
+#playlist{
+margin-top:10px;
+max-height:160px;
+overflow-y:auto;
+border:1px solid #0f0;
+padding:6px;
+font-size:13px;
+width:340px;
+}
+
+#playlist div{
+padding:4px;
+cursor:pointer;
+opacity:.7;
+}
+
+#playlist div.active{
+opacity:1;
+background:#0f0;
+color:black;
+}
+
+#playlist div:hover{
+opacity:1;
+}
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/butterchurn@2.6.7/dist/butterchurn.min.js"></script>
@@ -43,6 +103,9 @@ color:black;
 <div id="ui">
 <img src="logo.png" class="logo">
 
+<h1>TEKSTREAM 23</h1>
+<div class="subtitle">vinyl only · live · no sync · no edits</div>
+
 <audio id="player" controls crossorigin="anonymous"></audio>
 
 <div class="controls">
@@ -52,64 +115,80 @@ color:black;
 <button id="fs">FULLSCREEN</button>
 </div>
 
-<div id="track">loading…</div>
+<div id="playlist"></div>
 </div>
 
 <script>
 const ITEM="tekstream232311";
 const audio=document.getElementById("player");
-const track=document.getElementById("track");
+const playlistDiv=document.getElementById("playlist");
 
 let files=[],index=0,shuffle=false;
 
-/* LOAD PLAYLIST SAFELY */
+/* LOAD FILES */
 fetch(`https://archive.org/metadata/${ITEM}`)
 .then(r=>r.json())
 .then(data=>{
  files=data.files.filter(f=>f.name.toLowerCase().endsWith(".mp3"));
+ buildPlaylist();
  play(0);
 });
+
+function buildPlaylist(){
+ playlistDiv.innerHTML="";
+ files.forEach((f,i)=>{
+  const d=document.createElement("div");
+  d.textContent=f.name;
+  d.onclick=()=>play(i);
+  playlistDiv.appendChild(d);
+ });
+}
+
+function highlight(){
+ [...playlistDiv.children].forEach((el,i)=>{
+   el.classList.toggle("active",i===index);
+ });
+}
 
 function play(n){
  if(!files.length) return;
  index=(n+files.length)%files.length;
  audio.src=`https://archive.org/download/${ITEM}/${files[index].name}`;
- track.textContent=files[index].name;
- audio.play().catch(()=>play(index+1)); // skip blocked files
+ audio.play().catch(()=>play(index+1));
+ highlight();
 }
 
 audio.onended=()=> shuffle
  ? play(Math.floor(Math.random()*files.length))
  : play(index+1);
 
-/* BUTTONS */
 prev.onclick=()=>play(index-1);
 next.onclick=()=>play(index+1);
+
 shuffle.onclick=()=>{
  shuffle=!shuffle;
  shuffle.classList.toggle("active",shuffle);
 };
 
-/* AUDIO GRAPH */
+/* AUDIO + VISUALIZER */
 const ctx=new(window.AudioContext||window.webkitAudioContext)();
 const src=ctx.createMediaElementSource(audio);
-src.connect(ctx.destination);
 
-/* VISUALIZER */
 const viz=butterchurn.createVisualizer(ctx,document.getElementById("viz"),{
  width:innerWidth,
  height:innerHeight
 });
 
+src.connect(ctx.destination);
+viz.connectAudio(src);
+
 viz.loadPreset(butterchurnPresets.getPresets()["Flexi - Alien Tech"],0);
 
-/* RESIZE */
 function resize(){
  viz.setRendererSize(innerWidth,innerHeight);
 }
 onresize=resize;resize();
 
-/* RENDER LOOP */
 (function loop(){
  requestAnimationFrame(loop);
  viz.render();
