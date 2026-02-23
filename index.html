@@ -6,33 +6,95 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-html,body{margin:0;height:100%;background:black;color:#0f0;font-family:monospace;overflow:hidden}
-#viz{position:fixed;inset:0;z-index:-2}
-#ui{position:absolute;top:18px;left:50%;transform:translateX(-50%);text-align:center}
-.logo{width:100px;margin-bottom:8px}
-h1{margin:6px 0;font-size:34px;letter-spacing:3px;text-shadow:0 0 14px #0f0}
-.subtitle{font-size:14px;opacity:.8;margin-bottom:10px}
-audio{width:340px;filter:invert(1) hue-rotate(90deg)}
-.controls button{background:black;color:#0f0;border:1px solid #0f0;padding:6px 12px;margin:4px;cursor:pointer;box-shadow:0 0 10px #0f0}
-.controls button.active{background:#0f0;color:black}
-#playlist{margin-top:10px;max-height:160px;overflow-y:auto;border:1px solid #0f0;padding:6px;width:340px;font-size:13px}
-#playlist div{padding:4px;cursor:pointer;opacity:.7}
-#playlist div.active{background:#0f0;color:black;opacity:1}
-</style>
+html,body{
+margin:0;height:100%;
+background:black;color:#0f0;
+font-family:monospace;
+overflow:hidden;
+}
 
-<!-- OFFICIAL BUILDS (won't CORB) -->
-<script src="https://cdn.jsdelivr.net/gh/jberg/butterchurn@master/dist/butterchurn.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/jberg/butterchurn-presets@master/dist/butterchurnPresets.min.js"></script>
+#ui{
+position:absolute;
+top:20px;
+left:50%;
+transform:translateX(-50%);
+text-align:center;
+width:360px;
+}
+
+.logo{
+width:100px;
+margin-bottom:10px;
+}
+
+h1{
+margin:6px 0;
+font-size:34px;
+letter-spacing:3px;
+text-shadow:0 0 14px #0f0;
+}
+
+.subtitle{
+font-size:14px;
+opacity:.8;
+margin-bottom:10px;
+}
+
+audio{
+width:100%;
+filter:invert(1) hue-rotate(90deg);
+margin-bottom:8px;
+}
+
+.controls button{
+background:black;
+color:#0f0;
+border:1px solid #0f0;
+padding:6px 12px;
+margin:4px;
+cursor:pointer;
+box-shadow:0 0 10px #0f0;
+}
+
+.controls button.active{
+background:#0f0;
+color:black;
+}
+
+#playlist{
+margin-top:10px;
+max-height:240px;
+overflow-y:auto;
+border:1px solid #0f0;
+padding:6px;
+font-size:13px;
+}
+
+#playlist div{
+padding:4px;
+cursor:pointer;
+opacity:.7;
+}
+
+#playlist div.active{
+background:#0f0;
+color:black;
+opacity:1;
+}
+
+#playlist div:hover{
+opacity:1;
+}
+</style>
 </head>
 
 <body>
 
-<canvas id="viz"></canvas>
-
 <div id="ui">
 <img src="logo.png" class="logo">
+
 <h1>TEKSTREAM 23</h1>
-<div class="subtitle">vinyl only · 24/7 · no sync · no edits</div>
+<div class="subtitle">vinyl only · live · no sync · no edits</div>
 
 <audio id="player" controls crossorigin="anonymous"></audio>
 
@@ -40,10 +102,9 @@ audio{width:340px;filter:invert(1) hue-rotate(90deg)}
 <button id="prev">⏮</button>
 <button id="next">⏭</button>
 <button id="shuffle">SHUFFLE</button>
-<button id="fs">FULLSCREEN</button>
 </div>
 
-<div id="playlist"></div>
+<div id="playlist">Loading tracks…</div>
 </div>
 
 <script>
@@ -51,76 +112,52 @@ const ITEM="tekstream232311";
 const audio=document.getElementById("player");
 const playlist=document.getElementById("playlist");
 
-let tracks=[],i=0,shuffle=false;
+let tracks=[],index=0,shuffle=false;
 
-/* CORB-safe playlist load */
-fetch(`https://archive.org/metadata/${ITEM}?output=json`)
+/* Load all MP3s from Archive */
+fetch(`https://archive.org/metadata/${ITEM}`)
 .then(r=>r.json())
-.then(d=>{
- tracks=d.files.filter(f=>f.name.endsWith(".mp3"));
+.then(data=>{
+ tracks=data.files.filter(f=>f.name.toLowerCase().endsWith(".mp3"));
  build();
  play(0);
 });
 
 function build(){
  playlist.innerHTML="";
- tracks.forEach((t,n)=>{
+ tracks.forEach((t,i)=>{
   const row=document.createElement("div");
   row.textContent=t.name;
-  row.onclick=()=>play(n);
+  row.onclick=()=>play(i);
   playlist.appendChild(row);
  });
 }
 
 function highlight(){
- [...playlist.children].forEach((e,n)=>e.classList.toggle("active",n===i));
+ [...playlist.children].forEach((el,i)=>{
+  el.classList.toggle("active",i===index);
+ });
 }
 
-function play(n){
+function play(i){
  if(!tracks.length) return;
- i=(n+tracks.length)%tracks.length;
- audio.src=`https://archive.org/download/${ITEM}/${tracks[i].name}`;
- audio.load();
+ index=(i+tracks.length)%tracks.length;
+ audio.src=`https://archive.org/download/${ITEM}/${tracks[index].name}`;
  audio.play();
  highlight();
 }
 
 audio.onended=()=> shuffle
  ? play(Math.floor(Math.random()*tracks.length))
- : play(i+1);
+ : play(index+1);
 
-prev.onclick=()=>play(i-1);
-next.onclick=()=>play(i+1);
+prev.onclick=()=>play(index-1);
+next.onclick=()=>play(index+1);
+
 shuffle.onclick=()=>{
  shuffle=!shuffle;
  shuffle.classList.toggle("active",shuffle);
 };
-
-/* VISUALIZER */
-const ctx=new(window.AudioContext||window.webkitAudioContext)();
-const src=ctx.createMediaElementSource(audio);
-
-const viz=butterchurn.createVisualizer(ctx,document.getElementById("viz"),{
- width:innerWidth,
- height:innerHeight
-});
-
-src.connect(ctx.destination);
-viz.connectAudio(src);
-
-viz.loadPreset(butterchurnPresets.getPresets()["Flexi - Alien Tech"],0);
-
-function resize(){viz.setRendererSize(innerWidth,innerHeight)}
-onresize=resize;resize();
-
-(function loop(){requestAnimationFrame(loop);viz.render()})();
-
-audio.onplay=()=>ctx.resume();
-
-/* FULLSCREEN */
-fs.onclick=()=>document.fullscreenElement
- ? document.exitFullscreen()
- : document.getElementById("viz").requestFullscreen();
 </script>
 
 </body>
