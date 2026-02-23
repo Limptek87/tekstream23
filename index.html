@@ -10,9 +10,9 @@ html,body{
 margin:0;
 height:100%;
 background:black;
-color:#0f0;
+color:#00ff00;
 font-family:monospace;
-overflow:hidden
+overflow:hidden;
 }
 
 #viz{
@@ -37,33 +37,33 @@ opacity:.85;
 
 .logo{
 width:110px;
-margin:20px auto;
+margin:18px auto;
 display:block;
 }
 
-/* ===== MATRIX BUTTON ===== */
-
+/* MATRIX BUTTON */
 #fs{
 margin-top:14px;
 background:black;
-color:#0f0;
-border:1px solid #0f0;
-padding:6px 16px;
+color:#00ff00;
+border:1px solid #00ff00;
+padding:6px 18px;
 font-family:monospace;
 cursor:pointer;
-box-shadow:0 0 12px rgba(0,255,0,.45);
 letter-spacing:1px;
+box-shadow:0 0 14px rgba(0,255,0,.45);
 }
 
 #fs:hover{
-background:#0f0;
+background:#00ff00;
 color:black;
-box-shadow:0 0 18px rgba(0,255,0,.9);
+box-shadow:0 0 22px rgba(0,255,0,.9);
 }
 </style>
 
-<script src="https://unpkg.com/butterchurn/lib/butterchurn.min.js"></script>
-<script src="https://unpkg.com/butterchurn-presets/lib/butterchurnPresets.min.js"></script>
+<!-- FIXED BUILDS -->
+<script src="https://unpkg.com/butterchurn@2.6.7/dist/butterchurn.min.js"></script>
+<script src="https://unpkg.com/butterchurn-presets@2.4.7/dist/butterchurnPresets.min.js"></script>
 </head>
 
 <body>
@@ -74,7 +74,7 @@ box-shadow:0 0 18px rgba(0,255,0,.9);
 <img src="logo.png" class="logo">
 
 <audio id="player" controls crossorigin="anonymous">
-<source src="https://archive.org/download/tekstream232311/*.mp3" type="audio/mpeg">
+<source src="https://archive.org/download/tekstream232311/TEKSTREAM23.mp3" type="audio/mpeg">
 </audio>
 
 <button id="fs">VISUALS FULLSCREEN</button>
@@ -86,40 +86,43 @@ box-shadow:0 0 18px rgba(0,255,0,.9);
 const audio = document.getElementById("player");
 const canvas = document.getElementById("viz");
 
+/* AUDIO GRAPH */
 const ctx = new (window.AudioContext || window.webkitAudioContext)();
 const src = ctx.createMediaElementSource(audio);
 const analyser = ctx.createAnalyser();
 src.connect(analyser);
 analyser.connect(ctx.destination);
 
-const viz = butterchurn.createVisualizer(ctx, canvas,{
-width:window.innerWidth,
-height:window.innerHeight
+/* VISUALIZER */
+const viz = butterchurn.createVisualizer(ctx, canvas, {
+  width: window.innerWidth,
+  height: window.innerHeight
 });
 
 const presets = butterchurnPresets.getPresets();
-viz.loadPreset(presets["Flexi - Alien Tech"],0.0);
+viz.loadPreset(presets["Flexi - Alien Tech"], 0);
 
+/* RESIZE */
 function resize(){
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
-viz.setRendererSize(canvas.width,canvas.height);
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  viz.setRendererSize(canvas.width, canvas.height);
 }
-window.addEventListener("resize",resize);
+window.addEventListener("resize", resize);
 resize();
 
+/* RENDER LOOP */
 function render(){
-requestAnimationFrame(render);
-viz.render();
+  requestAnimationFrame(render);
+  viz.render();
 }
 render();
 
+/* AUDIO CONTEXT FIX */
 audio.onplay = () => ctx.resume();
 
-/* ===== FULLSCREEN TOGGLE ===== */
-
+/* FULLSCREEN TOGGLE */
 const fsBtn = document.getElementById("fs");
-
 fsBtn.onclick = () => {
   if (!document.fullscreenElement) {
     canvas.requestFullscreen();
