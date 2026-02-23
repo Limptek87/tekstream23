@@ -9,73 +9,118 @@
 html,body{margin:0;height:100%;background:black;color:#0f0;font-family:monospace;overflow:hidden}
 #viz{position:fixed;inset:0;z-index:-1}
 #ui{position:absolute;top:20px;left:50%;transform:translateX(-50%);text-align:center}
-audio{width:320px;filter:invert(1) hue-rotate(90deg)}
-#fs{margin-top:12px;background:black;color:#0f0;border:1px solid #0f0;padding:6px 16px;cursor:pointer;box-shadow:0 0 12px #0f0}
+
+audio{width:320px;filter:invert(1) hue-rotate(90deg);opacity:.85}
+
+.logo{width:110px;margin:14px auto;display:block}
+
+.controls button{
+background:black;
+color:#0f0;
+border:1px solid #0f0;
+padding:6px 12px;
+margin:4px;
+cursor:pointer;
+box-shadow:0 0 10px #0f0;
+}
+
+.controls button.active{
+background:#0f0;
+color:black;
+}
+
+#track{margin-top:6px;font-size:13px;opacity:.8}
 </style>
 
 <script src="https://unpkg.com/butterchurn@2.6.7/dist/butterchurn.min.js"></script>
 <script src="https://unpkg.com/butterchurn-presets@2.4.7/dist/butterchurnPresets.min.js"></script>
 </head>
+
 <body>
 
 <canvas id="viz"></canvas>
 
 <div id="ui">
-<audio id="player" controls></audio>
-<button id="fs">VISUALS FULLSCREEN</button>
+<img src="logo.png" class="logo">
+
+<audio id="player" controls crossorigin="anonymous"></audio>
+
+<div class="controls">
+<button id="prev">⏮</button>
+<button id="next">⏭</button>
+<button id="shuffle">SHUFFLE</button>
+<button id="fs">FULLSCREEN</button>
+</div>
+
+<div id="track">loading…</div>
 </div>
 
 <script>
-const ITEM = "tekstream232311";
-const audio = document.getElementById("player");
-const canvas = document.getElementById("viz");
+const ITEM="tekstream232311";
+const audio=document.getElementById("player");
+const track=document.getElementById("track");
 
-/* fetch all files via Archive API */
+let files=[],index=0,shuffle=false;
+
+/* LOAD PLAYLIST SAFELY */
 fetch(`https://archive.org/metadata/${ITEM}`)
 .then(r=>r.json())
 .then(data=>{
-  const files = data.files
-    .filter(f => f.name.endsWith(".mp3"))
-    .map(f => `https://archive.org/download/${ITEM}/${f.name}`);
-
-  let index = 0;
-  audio.src = files[0];
-
-  audio.onended = () => {
-    index = (index + 1) % files.length;
-    audio.src = files[index];
-    audio.play();
-  };
+ files=data.files.filter(f=>f.name.toLowerCase().endsWith(".mp3"));
+ play(0);
 });
 
-/* audio graph */
-const ctx = new (window.AudioContext||window.webkitAudioContext)();
-const src = ctx.createMediaElementSource(audio);
+function play(n){
+ if(!files.length) return;
+ index=(n+files.length)%files.length;
+ audio.src=`https://archive.org/download/${ITEM}/${files[index].name}`;
+ track.textContent=files[index].name;
+ audio.play().catch(()=>play(index+1)); // skip blocked files
+}
+
+audio.onended=()=> shuffle
+ ? play(Math.floor(Math.random()*files.length))
+ : play(index+1);
+
+/* BUTTONS */
+prev.onclick=()=>play(index-1);
+next.onclick=()=>play(index+1);
+shuffle.onclick=()=>{
+ shuffle=!shuffle;
+ shuffle.classList.toggle("active",shuffle);
+};
+
+/* AUDIO GRAPH */
+const ctx=new(window.AudioContext||window.webkitAudioContext)();
+const src=ctx.createMediaElementSource(audio);
 src.connect(ctx.destination);
 
-/* visualizer */
-const viz = butterchurn.createVisualizer(ctx, canvas,{
-  width:innerWidth,
-  height:innerHeight
+/* VISUALIZER */
+const viz=butterchurn.createVisualizer(ctx,document.getElementById("viz"),{
+ width:innerWidth,
+ height:innerHeight
 });
+
 viz.loadPreset(butterchurnPresets.getPresets()["Flexi - Alien Tech"],0);
 
+/* RESIZE */
 function resize(){
-canvas.width=innerWidth;
-canvas.height=innerHeight;
-viz.setRendererSize(innerWidth,innerHeight);
+ viz.setRendererSize(innerWidth,innerHeight);
 }
-window.onresize=resize; resize();
+onresize=resize;resize();
 
-function loop(){requestAnimationFrame(loop);viz.render()}
-loop();
+/* RENDER LOOP */
+(function loop(){
+ requestAnimationFrame(loop);
+ viz.render();
+})();
 
 audio.onplay=()=>ctx.resume();
 
-/* fullscreen */
-document.getElementById("fs").onclick=()=>{
-document.fullscreenElement?document.exitFullscreen():canvas.requestFullscreen()
-}
+/* FULLSCREEN */
+fs.onclick=()=>document.fullscreenElement
+ ? document.exitFullscreen()
+ : document.getElementById("viz").requestFullscreen();
 </script>
 
 </body>
