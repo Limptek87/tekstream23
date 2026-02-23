@@ -10,16 +10,12 @@ html,body{
 margin:0;height:100%;
 background:black;color:#0f0;
 font-family:monospace;
-overflow:hidden;
 }
 
 #ui{
-position:absolute;
-top:20px;
-left:50%;
-transform:translateX(-50%);
+max-width:380px;
+margin:20px auto;
 text-align:center;
-width:360px;
 }
 
 .logo{
@@ -63,7 +59,7 @@ color:black;
 
 #playlist{
 margin-top:10px;
-max-height:240px;
+max-height:260px;
 overflow-y:auto;
 border:1px solid #0f0;
 padding:6px;
@@ -82,9 +78,7 @@ color:black;
 opacity:1;
 }
 
-#playlist div:hover{
-opacity:1;
-}
+#playlist div:hover{opacity:1;}
 </style>
 </head>
 
@@ -94,7 +88,7 @@ opacity:1;
 <img src="logo.png" class="logo">
 
 <h1>TEKSTREAM 23</h1>
-<div class="subtitle">vinyl only · live · no sync · no edits</div>
+<div class="subtitle">vinyl only · 24/7 · freetek · no edits</div>
 
 <audio id="player" controls crossorigin="anonymous"></audio>
 
@@ -111,21 +105,37 @@ opacity:1;
 const ITEM="tekstream232311";
 const audio=document.getElementById("player");
 const playlist=document.getElementById("playlist");
+const prev=document.getElementById("prev");
+const next=document.getElementById("next");
+const shuffleBtn=document.getElementById("shuffle");
 
-let tracks=[],index=0,shuffle=false;
+let original=[],queue=[],index=0,shuffle=false;
 
-/* Load all MP3s from Archive */
+/* Load MP3 list from Archive */
 fetch(`https://archive.org/metadata/${ITEM}`)
 .then(r=>r.json())
 .then(data=>{
- tracks=data.files.filter(f=>f.name.toLowerCase().endsWith(".mp3"));
- build();
+ original=data.files.filter(f=>f.name.toLowerCase().endsWith(".mp3"));
+ resetQueue();
+ buildPlaylist();
  play(0);
 });
 
-function build(){
+function resetQueue(){
+ queue=[...original];
+ if(shuffle) shuffleArray(queue);
+}
+
+function shuffleArray(a){
+ for(let i=a.length-1;i>0;i--){
+  const j=Math.floor(Math.random()*(i+1));
+  [a[i],a[j]]=[a[j],a[i]];
+ }
+}
+
+function buildPlaylist(){
  playlist.innerHTML="";
- tracks.forEach((t,i)=>{
+ queue.forEach((t,i)=>{
   const row=document.createElement("div");
   row.textContent=t.name;
   row.onclick=()=>play(i);
@@ -140,23 +150,24 @@ function highlight(){
 }
 
 function play(i){
- if(!tracks.length) return;
- index=(i+tracks.length)%tracks.length;
- audio.src=`https://archive.org/download/${ITEM}/${tracks[index].name}`;
+ if(!queue.length) return;
+ index=(i+queue.length)%queue.length;
+ audio.src=`https://archive.org/download/${ITEM}/${queue[index].name}`;
  audio.play();
  highlight();
 }
 
-audio.onended=()=> shuffle
- ? play(Math.floor(Math.random()*tracks.length))
- : play(index+1);
+audio.onended=()=>play(index+1);
 
 prev.onclick=()=>play(index-1);
 next.onclick=()=>play(index+1);
 
-shuffle.onclick=()=>{
+shuffleBtn.onclick=()=>{
  shuffle=!shuffle;
- shuffle.classList.toggle("active",shuffle);
+ shuffleBtn.classList.toggle("active",shuffle);
+ resetQueue();
+ buildPlaylist();
+ play(0);
 };
 </script>
 
