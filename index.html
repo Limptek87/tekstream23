@@ -7,47 +7,49 @@
 
 <style>
 html,body{
-margin:0;height:100%;
-background:black;color:#0f0;
+margin:0;
+background:black;
+color:#0f0;
 font-family:monospace;
 }
 
 #ui{
-max-width:380px;
-margin:20px auto;
+max-width:420px;
+margin:auto;
+padding:16px;
 text-align:center;
 }
 
-.logo{
-width:100px;
-margin-bottom:10px;
-}
+.logo{width:90px;margin-bottom:6px;}
 
 h1{
-margin:6px 0;
-font-size:34px;
+font-size:32px;
 letter-spacing:3px;
 text-shadow:0 0 14px #0f0;
+margin:6px 0;
 }
 
-.subtitle{
-font-size:14px;
-opacity:.8;
-margin-bottom:10px;
-}
+.subtitle{opacity:.8;margin-bottom:10px;}
 
 audio{
 width:100%;
 filter:invert(1) hue-rotate(90deg);
-margin-bottom:8px;
+}
+
+.controls{
+display:flex;
+justify-content:space-between;
+margin:10px 0;
 }
 
 .controls button{
+flex:1;
+margin:0 4px;
 background:black;
 color:#0f0;
 border:1px solid #0f0;
-padding:6px 12px;
-margin:4px;
+padding:10px;
+font-size:16px;
 cursor:pointer;
 box-shadow:0 0 10px #0f0;
 }
@@ -58,18 +60,17 @@ color:black;
 }
 
 #playlist{
-margin-top:10px;
-max-height:260px;
-overflow-y:auto;
 border:1px solid #0f0;
 padding:6px;
+max-height:260px;
+overflow-y:auto;
 font-size:13px;
 }
 
 #playlist div{
-padding:4px;
+padding:6px;
 cursor:pointer;
-opacity:.7;
+opacity:.75;
 }
 
 #playlist div.active{
@@ -78,7 +79,14 @@ color:black;
 opacity:1;
 }
 
-#playlist div:hover{opacity:1;}
+#playlist div:hover{opacity:1}
+
+/* 📱 MOBILE tweaks */
+@media (max-width:600px){
+ h1{font-size:26px;}
+ .controls button{font-size:18px;padding:12px;}
+ #playlist{max-height:180px;}
+}
 </style>
 </head>
 
@@ -88,14 +96,14 @@ opacity:1;
 <img src="logo.png" class="logo">
 
 <h1>TEKSTREAM 23</h1>
-<div class="subtitle">vinyl only · 24/7 · freetek · no edits</div>
+<div class="subtitle">vinyl only · 24/7 · free download · no edits</div>
 
 <audio id="player" controls crossorigin="anonymous"></audio>
 
 <div class="controls">
 <button id="prev">⏮</button>
-<button id="next">⏭</button>
 <button id="shuffle">SHUFFLE</button>
+<button id="next">⏭</button>
 </div>
 
 <div id="playlist">Loading tracks…</div>
@@ -109,64 +117,61 @@ const prev=document.getElementById("prev");
 const next=document.getElementById("next");
 const shuffleBtn=document.getElementById("shuffle");
 
-let original=[],queue=[],index=0,shuffle=false;
+let tracks=[],order=[],pos=0,shuffle=false;
 
-/* Load MP3 list from Archive */
+/* load all mp3 */
 fetch(`https://archive.org/metadata/${ITEM}`)
 .then(r=>r.json())
-.then(data=>{
- original=data.files.filter(f=>f.name.toLowerCase().endsWith(".mp3"));
- resetQueue();
- buildPlaylist();
+.then(d=>{
+ tracks=d.files.filter(f=>f.name.endsWith(".mp3"));
+ buildOrder();
+ render();
  play(0);
 });
 
-function resetQueue(){
- queue=[...original];
- if(shuffle) shuffleArray(queue);
+function buildOrder(){
+ order=[...tracks.keys()];
+ if(shuffle) shuffleOrder(order);
 }
 
-function shuffleArray(a){
+function shuffleOrder(a){
  for(let i=a.length-1;i>0;i--){
   const j=Math.floor(Math.random()*(i+1));
   [a[i],a[j]]=[a[j],a[i]];
  }
 }
 
-function buildPlaylist(){
+function render(){
  playlist.innerHTML="";
- queue.forEach((t,i)=>{
+ order.forEach((i,n)=>{
   const row=document.createElement("div");
-  row.textContent=t.name;
-  row.onclick=()=>play(i);
+  row.textContent=tracks[i].name;
+  row.onclick=()=>play(n);
   playlist.appendChild(row);
  });
 }
 
 function highlight(){
- [...playlist.children].forEach((el,i)=>{
-  el.classList.toggle("active",i===index);
- });
+ [...playlist.children].forEach((e,i)=>e.classList.toggle("active",i===pos));
 }
 
-function play(i){
- if(!queue.length) return;
- index=(i+queue.length)%queue.length;
- audio.src=`https://archive.org/download/${ITEM}/${queue[index].name}`;
+function play(n){
+ pos=(n+order.length)%order.length;
+ audio.src=`https://archive.org/download/${ITEM}/${tracks[order[pos]].name}`;
  audio.play();
  highlight();
 }
 
-audio.onended=()=>play(index+1);
+audio.onended=()=>play(pos+1);
 
-prev.onclick=()=>play(index-1);
-next.onclick=()=>play(index+1);
+prev.onclick=()=>play(pos-1);
+next.onclick=()=>play(pos+1);
 
 shuffleBtn.onclick=()=>{
  shuffle=!shuffle;
  shuffleBtn.classList.toggle("active",shuffle);
- resetQueue();
- buildPlaylist();
+ buildOrder();
+ render();
  play(0);
 };
 </script>
