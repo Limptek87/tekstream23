@@ -2,134 +2,80 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<title>TEKSTREAM 23 – LIMPTEK</title>
+<title>TEKSTREAM – LIMPTEK</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-html,body{
-margin:0;
-height:100%;
-background:black;
-color:#00ff00;
-font-family:monospace;
-overflow:hidden;
-}
-
-#viz{
-position:fixed;
-inset:0;
-z-index:-1;
-}
-
-#ui{
-position:absolute;
-top:20px;
-left:50%;
-transform:translateX(-50%);
-text-align:center;
-}
-
-audio{
-width:320px;
-filter:invert(1) hue-rotate(90deg);
-opacity:.85;
-}
-
-.logo{
-width:110px;
-margin:18px auto;
-display:block;
-}
-
-/* MATRIX BUTTON */
-#fs{
-margin-top:14px;
-background:black;
-color:#00ff00;
-border:1px solid #00ff00;
-padding:6px 18px;
-font-family:monospace;
-cursor:pointer;
-letter-spacing:1px;
-box-shadow:0 0 14px rgba(0,255,0,.45);
-}
-
-#fs:hover{
-background:#00ff00;
-color:black;
-box-shadow:0 0 22px rgba(0,255,0,.9);
-}
+html,body{margin:0;height:100%;background:black;color:#0f0;font-family:monospace;overflow:hidden}
+#viz{position:fixed;inset:0;z-index:-1}
+#ui{position:absolute;top:20px;left:50%;transform:translateX(-50%);text-align:center}
+audio{width:320px;filter:invert(1) hue-rotate(90deg)}
+#fs{margin-top:12px;background:black;color:#0f0;border:1px solid #0f0;padding:6px 16px;cursor:pointer;box-shadow:0 0 12px #0f0}
 </style>
 
-<!-- FIXED BUILDS -->
 <script src="https://unpkg.com/butterchurn@2.6.7/dist/butterchurn.min.js"></script>
 <script src="https://unpkg.com/butterchurn-presets@2.4.7/dist/butterchurnPresets.min.js"></script>
 </head>
-
 <body>
 
 <canvas id="viz"></canvas>
 
 <div id="ui">
-<img src="logo.png" class="logo">
-
-<audio id="player" controls crossorigin="anonymous">
-<source src="https://archive.org/download/tekstream232311/TEKSTREAM23.mp3" type="audio/mpeg">
-</audio>
-
+<audio id="player" controls></audio>
 <button id="fs">VISUALS FULLSCREEN</button>
-
-<p>vinyl only · 23 · no sync · no edits</p>
 </div>
 
 <script>
+const ITEM = "tekstream232311";
 const audio = document.getElementById("player");
 const canvas = document.getElementById("viz");
 
-/* AUDIO GRAPH */
-const ctx = new (window.AudioContext || window.webkitAudioContext)();
-const src = ctx.createMediaElementSource(audio);
-const analyser = ctx.createAnalyser();
-src.connect(analyser);
-analyser.connect(ctx.destination);
+/* fetch all files via Archive API */
+fetch(`https://archive.org/metadata/${ITEM}`)
+.then(r=>r.json())
+.then(data=>{
+  const files = data.files
+    .filter(f => f.name.endsWith(".mp3"))
+    .map(f => `https://archive.org/download/${ITEM}/${f.name}`);
 
-/* VISUALIZER */
-const viz = butterchurn.createVisualizer(ctx, canvas, {
-  width: window.innerWidth,
-  height: window.innerHeight
+  let index = 0;
+  audio.src = files[0];
+
+  audio.onended = () => {
+    index = (index + 1) % files.length;
+    audio.src = files[index];
+    audio.play();
+  };
 });
 
-const presets = butterchurnPresets.getPresets();
-viz.loadPreset(presets["Flexi - Alien Tech"], 0);
+/* audio graph */
+const ctx = new (window.AudioContext||window.webkitAudioContext)();
+const src = ctx.createMediaElementSource(audio);
+src.connect(ctx.destination);
 
-/* RESIZE */
+/* visualizer */
+const viz = butterchurn.createVisualizer(ctx, canvas,{
+  width:innerWidth,
+  height:innerHeight
+});
+viz.loadPreset(butterchurnPresets.getPresets()["Flexi - Alien Tech"],0);
+
 function resize(){
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  viz.setRendererSize(canvas.width, canvas.height);
+canvas.width=innerWidth;
+canvas.height=innerHeight;
+viz.setRendererSize(innerWidth,innerHeight);
 }
-window.addEventListener("resize", resize);
-resize();
+window.onresize=resize; resize();
 
-/* RENDER LOOP */
-function render(){
-  requestAnimationFrame(render);
-  viz.render();
+function loop(){requestAnimationFrame(loop);viz.render()}
+loop();
+
+audio.onplay=()=>ctx.resume();
+
+/* fullscreen */
+document.getElementById("fs").onclick=()=>{
+document.fullscreenElement?document.exitFullscreen():canvas.requestFullscreen()
 }
-render();
-
-/* AUDIO CONTEXT FIX */
-audio.onplay = () => ctx.resume();
-
-/* FULLSCREEN TOGGLE */
-const fsBtn = document.getElementById("fs");
-fsBtn.onclick = () => {
-  if (!document.fullscreenElement) {
-    canvas.requestFullscreen();
-  } else {
-    document.exitFullscreen();
-  }
-};
 </script>
 
 </body>
